@@ -7,7 +7,7 @@
 <body>
 <div id="container">
 <header><?php include_once("header.php"); ?></header>
-<main><?php out($content); ?></main>
+<main><?php raw($content); ?></main>
 <footer></footer>
 </div>
 </body>

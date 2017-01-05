@@ -5,12 +5,22 @@ if [ $# -ge 1 ] && [ $1 = "clean" ]; then
 	exit
 fi
 
-echo "
-create table users (
-	username text,
-	password_hash text
-);
-"|sqlite3 database.db 
+if [ $# -ge 1 ] && [ $1 = "addbook" ]; then
+	echo -n "book title:"
+	read booktitle
+	echo -n "book author:"
+	read bookauthor
+	echo -n "book price:"
+	read bookprice
+	echo -n "book user:"
+	read bookuser
+
+	echo "insert into books(username, title, author, price, created_at) values ('$bookuser', '$booktitle', '$bookauthor', $bookprice, datetime('now', '+09:00:00'));	" | sqlite3 database.db
+
+	exit
+fi
+
+cat schema.sql | sqlite3 database.db 
 
 echo -n "username:"
 read username

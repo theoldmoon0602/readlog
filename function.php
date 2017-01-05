@@ -1,16 +1,21 @@
 <?php
 
-class Output {
+function raw($content) {
+	print($content);
+}
+
+function escape($content) {
+	$double_encoding = false;
+	$o = htmlspecialchars($content, ENT_QUOTES, "UTF-8", $double_encoding);
+	return htmlspecialchars($content);
+}
+
+function error($msg) {
+	print("<span style='color: red;'>$msg</span>");
 }
 
 function out($content) {
-	if ($content instanceof Output) {
-		print($content->specialchars());
-		return;
-	}
-	$double_encoding = false;
-	$o = htmlspecialchars($content, ENT_QUOTES, "UTF-8", $double_encoding);
-	print( htmlspecialchars($content) );
+	print(escape($content));
 }
 
 function connect() {
@@ -48,9 +53,9 @@ function login($userinfo=NULL) {
 
 function draw($dirname, $config=[]) {
 	$defaults = [
-		'404' => '404.php',
 		'template' => 'template.php',
-		'index' => 'index.php'
+		'index' => 'index.php',
+		'404page' => '404.php',
 	];
 	$config = array_merge($defaults, $config);
 
@@ -74,8 +79,8 @@ function draw($dirname, $config=[]) {
 		return;
 	}
 
-	if (file_exists($config['404'])) {
-		include_once($url);
+	if (file_exists($config['404page'])) {
+		include_once($config['404page']);
 		$content = ob_get_contents();
 		ob_clean();
 		ob_flush();
@@ -88,4 +93,34 @@ function draw($dirname, $config=[]) {
 
 function logout() {
 	unset($_SESSION['login']);
+}
+
+function readbooknum() {
+	$db = connect();
+	$stmt = $db->prepare('select count(*) from books');
+	$stmt->execute();
+
+	return $stmt->fetch()['count(*)'];
+}
+
+function recentbooks ($rows, $user=NULL) {
+	$db = connect();
+	if ($user) {
+		$stmt = $db->prepare('select * from books where user=? order by created_at desc limit ?');
+		$stmt->execute([$user, $rows]);
+		return $stmt->fetchAll();
+	}
+	$stmt = $db->prepare('select * from books order by created_at desc');
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
+
+function sqlitedatetime() {
+	return date('Y-m-d H:i:s');
+}
+
+function addbook($values, $user) {
+	$db = connect();
+	$stmt = $db->prepare('insert into books(title, author, price, username, created_at) values (?, ?, ?, ?, ?);');
+	return $stmt->execute([$values['title'], $values['author'], $values['price'], $user, sqlitedatetime()]);
 }

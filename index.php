@@ -1,6 +1,6 @@
 <?php
 
-$loggedin = login() ? "HELLO" . login() : "pls login";
-$title = 'ReadLog';
-
-echo $loggedin;
+$title = 'Index';
+if (login()) {
+	include_once("loginindex.php");
+}

@@ -1,5 +1,5 @@
 <div class="header-bar">
-	<h1>ReadLog</h1>
+	<h1><a href="index.php">ReadLog</a></h1>
 	<h2><?php out($title); ?></h2>
 
 	<?php if(!login()) { ?>
